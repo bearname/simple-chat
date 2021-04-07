@@ -52,29 +52,6 @@ public class MessageService {
     }
 
 
-    private void fillMeta(Message message) throws IOException {
-        String text = message.getText();
-        Matcher matcher = URL_REGEX.matcher(text);
-
-        if (matcher.find()) {
-            String url = text.substring(matcher.start(), matcher.end());
-
-            matcher = IMG_REGEX.matcher(url);
-
-            message.setLink(url);
-
-            if (matcher.find()) {
-                message.setLinkCover(url);
-            } else if (!url.contains("youtu")) {
-                MetaDto meta = getMeta(url);
-
-                message.setLinkCover(meta.getCover());
-                message.setLinkTitle(meta.getTitle());
-                message.setLinkDescription(meta.getDescription());
-            }
-        }
-    }
-
     private MetaDto getMeta(String url) throws IOException {
         Document doc = Jsoup.connect(url).get();
 
@@ -87,10 +64,6 @@ public class MessageService {
                 getContent(description.first()),
                 getContent(cover.first())
         );
-    }
-
-    private String getContent(Element element) {
-        return element == null ? "" : element.attr("content");
     }
 
     public void delete(Message message) {
@@ -135,5 +108,32 @@ public class MessageService {
                 pageable.getPageNumber(),
                 page.getTotalPages()
         );
+    }
+
+    private void fillMeta(Message message) throws IOException {
+        String text = message.getText();
+        Matcher matcher = URL_REGEX.matcher(text);
+
+        if (matcher.find()) {
+            String url = text.substring(matcher.start(), matcher.end());
+
+            matcher = IMG_REGEX.matcher(url);
+
+            message.setLink(url);
+
+            if (matcher.find()) {
+                message.setLinkCover(url);
+            } else if (!url.contains("youtu")) {
+                MetaDto meta = getMeta(url);
+
+                message.setLinkCover(meta.getCover());
+                message.setLinkTitle(meta.getTitle());
+                message.setLinkDescription(meta.getDescription());
+            }
+        }
+    }
+
+    private String getContent(Element element) {
+        return element == null ? "" : element.attr("content");
     }
 }

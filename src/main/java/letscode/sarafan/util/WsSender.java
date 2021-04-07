@@ -27,7 +27,7 @@ public class WsSender {
                 .writerWithView(view);
 
         return (EventType eventType, T payload) -> {
-            String value = null;
+            String value;
 
             try {
                 value = writer.writeValueAsString(payload);
@@ -35,8 +35,7 @@ public class WsSender {
                 throw new RuntimeException(e);
             }
 
-            template.convertAndSend(
-                    "/topic/activity",
+            template.convertAndSend("/topic/activity",
                     new WsEventDto(objectType, eventType, value)
             );
         };
